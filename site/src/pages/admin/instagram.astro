@@ -1,0 +1,73 @@
+---
+import { env } from 'cloudflare:workers';
+import Admin from '../../layouts/Admin.astro';
+import RefreshButton from '../../components/admin/RefreshButton.astro';
+import { ago, nextRun, statusTag, tokenLine, when } from '../../components/admin/ig';
+import { listIgLog } from '../../lib/db';
+import { IG_FEED_KEY, IG_STATUS_KEY, type IgFeed, type IgStatus } from '../../lib/feed';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const [status, feed, log] = await Promise.all([
+  env.IG_CACHE.get<IgStatus>(IG_STATUS_KEY, 'json'),
+  env.IG_CACHE.get<IgFeed>(IG_FEED_KEY, 'json'),
+  listIgLog(env.DB, 10),
+]);
+const tag = statusTag(status);
+const at = status ? when(status.checkedAt).replace(/^Today (.*)/, '$1 today') : '';
+---
+
+<Admin title="Instagram" back>
+  <p class="a-lede" slot="lede">Posts refresh every hour. You can force one below.</p>
+
+  <div class="a-split">
+    <section class:list={['a-card', tag.tone === 'bad' && 'is-bad']} aria-labelledby="status-h">
+      <div class="a-card-head">
+        <h2 id="status-h">Status</h2>
+        <span class:list={['a-tag', `tone-${tag.tone}`]}>{tag.label}</span>
+      </div>
+
+      {tag.tone === 'none' && <p>No refresh has run yet. The site shows your featured pieces in "The work" until the first one works.</p>}
+      {tag.tone === 'ok' && <p>Everything’s working. "The work" shows your latest Instagram posts.</p>}
+      {tag.tone === 'warn' && <p>The refresh at {at} didn’t work. The site keeps showing the posts from the last good refresh, and it tries again every hour.</p>}
+      {tag.tone === 'bad' && <p>Instagram rejected the access token at {at}. The site is showing your featured pieces in "The work" until this is fixed.</p>}
+
+      <dl class="a-facts">
+        <div><dt>Last good refresh</dt><dd>{feed ? when(feed.updatedAt) : 'Never'}</dd></div>
+        {status?.state === 'ok' && <div><dt>Posts</dt><dd>{feed?.posts.length ?? 0} · {ago(status.checkedAt)}</dd></div>}
+        {status && status.state !== 'ok' && (
+          <div><dt>Error</dt><dd>{status.message ?? 'Unknown error'}{status.errorCode && ` (code ${status.errorCode})`}</dd></div>
+        )}
+        {tag.tone !== 'bad' && <div><dt>Next refresh</dt><dd>{nextRun()}</dd></div>}
+        {tag.tone !== 'bad' && <div><dt>Token</dt><dd>{tokenLine(status)}</dd></div>}
+        <div><dt>Account</dt><dd>@haleboy.tattoos</dd></div>
+      </dl>
+
+      {tag.tone === 'bad' && (
+        <p class="a-callout">To fix: a new long-lived token has to be generated in the Meta app and saved as a Cloudflare secret. The README has the steps.</p>
+      )}
+      {status?.state === 'ok' && status.message && <p class="a-callout">{status.message}</p>}
+
+      <RefreshButton label={tag.tone === 'ok' || tag.tone === 'none' ? 'Refresh now' : 'Retry now'} red={tag.tone === 'bad'} />
+    </section>
+
+    <section class="a-card" aria-labelledby="log-h">
+      <h2 id="log-h">Recent refreshes</h2>
+      {log.length ? (
+        <ul class="a-log">
+          {log.map((r) => (
+            <li>
+              <span>
+                {when(r.ran_at)}
+                {r.ok ? <span class="a-muted"> · {r.posts} posts</span> : r.message && <span class="a-log-msg">{r.message}</span>}
+              </span>
+              <span class:list={['a-tag', r.ok ? 'tone-ok' : 'tone-bad']}>{r.ok ? 'OK' : 'Failed'}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="a-muted">No refreshes yet. The first one runs at the top of the hour.</p>
+      )}
+    </section>
+  </div>
+</Admin>

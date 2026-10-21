@@ -1,0 +1,10 @@
+{
+  "name": "haleboy",
+  "private": true,
+  "description": "Workspace root. The Astro app lives in site/.",
+  "scripts": {
+    "dev": "npm --prefix site run dev",
+    "build": "npm --prefix site run build",
+    "preview:jotform": "node site/docs/preview/serve.mjs"
+  }
+}

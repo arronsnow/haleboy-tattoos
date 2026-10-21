@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Booking preview: Jotform embed (approach b)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --black:#000000; --bone:#F4F2EE; --red:#C8102E; --ash:#C9C6C1; --ash-dim:#A8A5A0; --ink:#2A2A2A; --field-border:#5A5753; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--black); color: var(--bone); font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif; }
+  a { color: var(--bone); }
+  a:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+  .note { border-bottom: 1px solid var(--ink); padding: 16px 24px; font-size: 15px; line-height: 1.6; color: var(--ash); }
+  .note strong { color: var(--bone); }
+  section { max-width: 1440px; margin: 0 auto; padding: 96px 80px; border-top: 1px solid var(--ink); display: grid; grid-template-columns: minmax(0, 1fr) 640px; gap: 96px; }
+  h2 { margin: 0 0 48px; font-family: "Dela Gothic One", sans-serif; font-size: clamp(44px, 6vw, 80px); line-height: 1; font-weight: 400; }
+  .steps { display: flex; flex-direction: column; gap: 32px; }
+  .step { display: flex; gap: 24px; align-items: flex-start; }
+  .step-num { font-family: "Dela Gothic One", sans-serif; font-size: 44px; line-height: 1; color: var(--red); width: 56px; flex-shrink: 0; }
+  .step-title { font-size: 21px; font-weight: 700; margin-bottom: 6px; }
+  .step-text { font-size: 17px; line-height: 1.6; color: var(--ash); }
+  .label { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash-dim); margin: 0 0 12px; }
+  iframe { display: block; width: 100%; min-height: 640px; border: 1px solid var(--field-border); background: var(--black); }
+  .compare { display: block; }
+  .compare iframe { max-width: 375px; height: 600px; min-height: 0; }
+  @media (max-width: 900px) { section { grid-template-columns: 1fr; gap: 48px; padding: 64px 24px; } }
+  @media (max-width: 480px) { section { padding: 48px 16px; } }
+</style>
+</head>
+<body>
+<p class="note">
+  <strong>Checkpoint preview, not the site.</strong> This page shows approach (b): the shop's real tattoo form
+  <code>250787056108157</code> next to the design's three steps, with our theme
+  (<a href="/jotform-haleboy.css" target="_blank" rel="noopener">jotform-haleboy.css</a>) applied the way
+  Jotform's "Inject custom CSS" will apply it. The URL pre-selects <code>whoWould=Eathan</code> on the artist card.
+  Submitting is blocked in this preview.
+  Photos you pick in the upload cards still go to Jotform's upload server, so don't upload anything private.
+  Full findings: <a href="/jotform-report.md" target="_blank" rel="noopener">jotform-report.md</a>.
+</p>
+
+<main>
+<section id="book" aria-labelledby="book-title">
+  <div>
+    <h2 id="book-title">Book a session</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num" aria-hidden="true">一</div><div><div class="step-title">Send your idea</div><div class="step-text">Characters, references, rough size and where it goes.</div></div></div>
+      <div class="step"><div class="step-num" aria-hidden="true">二</div><div><div class="step-title">Get a quote and a date</div><div class="step-text">Haleboy replies with a price range and open days. [DEPOSIT AMOUNT] holds your spot.</div></div></div>
+      <div class="step"><div class="step-num" aria-hidden="true">三</div><div><div class="step-title">Sit for your tattoo</div><div class="step-text">You see the final drawing before the needle touches skin.</div></div></div>
+    </div>
+  </div>
+  <div>
+    <p class="label">Proposed: the shop form with the Haleboy theme</p>
+    <iframe title="Tattoo booking request (themed preview)" src="/form?whoWould=Eathan"
+      style="height:720px" allow="fullscreen"></iframe>
+  </div>
+</section>
+
+<section class="compare" aria-labelledby="cmp-title">
+  <h2 id="cmp-title" style="font-size:32px;margin-bottom:24px">For comparison: before the theme</h2>
+  <p class="label">The same form as Jotform serves it today (do not submit: this one is live)</p>
+  <iframe title="Shop tattoo form without the Haleboy theme" loading="lazy"
+    src="https://form.jotform.com/250787056108157" style="max-width:640px;height:720px;margin-bottom:48px"></iframe>
+  <p class="label">iloveyou.tattoo/booking: Jotform app 251847711631154, 375×600</p>
+  <iframe title="Shop's current tattoo booking app" loading="lazy"
+    src="https://www.jotform.com/app/251847711631154?appEmbedded=1"
+    allow="geolocation; microphone; camera"></iframe>
+</section>
+</main>
+
+</body>
+</html>

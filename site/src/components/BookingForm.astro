@@ -1,0 +1,59 @@
+---
+// The shop's Jotform card form, embedded (docs/jotform-report.md §5): its four file
+// uploads can't go through the Jotform API. The look comes from public/jotform-theme.css,
+// pasted into Jotform's designer (docs/jotform-theme.md), since our CSS can't reach the iframe.
+const FORM_ID = '250787056108157';
+const src = `https://form.jotform.com/${FORM_ID}?whoWould=Eathan`;
+---
+
+<div class="booking-form">
+  <iframe
+    id={`JotFormIFrame-${FORM_ID}`}
+    title="Tattoo booking request"
+    data-src={src}
+    allow="geolocation; microphone; camera"
+  ></iframe>
+  <p class="fallback">
+    Form not loading? <a href={src} target="_blank" rel="noopener">Open it in a new tab</a>
+  </p>
+</div>
+
+<script>
+  declare global {
+    interface Window { jotformEmbedHandler?: (selector: string, origin: string) => void }
+  }
+  // Set the iframe src only when the form is about a screen away: native lazy-loading starts far enough out on desktop to load Jotform (and its third-party cookies) with the page.
+  const frame = document.getElementById('JotFormIFrame-250787056108157') as HTMLIFrameElement | null;
+  if (frame) {
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      // Load Jotform's auto-resize handler only once the form has loaded, so it never costs the first paint.
+      frame.addEventListener('load', () => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js';
+        s.onload = () => window.jotformEmbedHandler?.("iframe[id='JotFormIFrame-250787056108157']", 'https://form.jotform.com/');
+        document.head.appendChild(s);
+      }, { once: true });
+      frame.src = frame.dataset.src!;
+    }, { rootMargin: '800px 0px' });
+    io.observe(frame);
+  }
+</script>
+
+<style>
+  .booking-form { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  iframe {
+    display: block;
+    width: 100%;
+    min-height: 720px;
+    border: 0;
+    background: var(--black);
+  }
+  .fallback { margin: 0; font-size: 15px; color: var(--ash); }
+
+  @media (max-width: 479.98px) {
+    iframe { min-height: 640px; }
+    .fallback a { display: block; margin-top: 8px; padding: 14px; border: 2px solid var(--bone); text-align: center; text-decoration: none; font-weight: 700; }
+  }
+</style>

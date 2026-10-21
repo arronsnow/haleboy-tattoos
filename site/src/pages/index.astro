@@ -1,0 +1,37 @@
+---
+import { env } from 'cloudflare:workers';
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import WorkGrid from '../components/WorkGrid.astro';
+import Gallery from '../components/Gallery.astro';
+import Flash from '../components/Flash.astro';
+import About from '../components/About.astro';
+import Booking from '../components/Booking.astro';
+import Footer from '../components/Footer.astro';
+import JsonLd from '../components/JsonLd.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { getContent } from '../lib/content';
+import { getFlash, getGallery, getPortraitImage, getWorkPanels } from '../lib/feed';
+
+const [work, gallery, flash, portrait, content] = await Promise.all([
+  getWorkPanels(env),
+  getGallery(env),
+  getFlash(env),
+  getPortraitImage(env),
+  getContent(env.DB),
+]);
+---
+
+<Base>
+  <JsonLd slot="head" content={content} />
+  <Header slot="header" gallery={gallery.length > 0} />
+  <Hero />
+  <WorkGrid work={work} />
+  <Gallery items={gallery} />
+  <Flash items={flash} />
+  <About portrait={portrait} content={content} />
+  <Booking content={content} />
+  <Footer slot="footer" content={content} />
+  <Lightbox slot="footer" />
+</Base>

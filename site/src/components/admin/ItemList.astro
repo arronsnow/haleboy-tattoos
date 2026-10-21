@@ -1,0 +1,134 @@
+---
+// The ordered list, upload sheet and delete confirmation shared by the featured, gallery and flash admin pages.
+import type { ResponsiveImage } from '../../lib/images';
+import Img from '../Img.astro';
+
+export interface Item {
+  id: number;
+  a: string;
+  b: string;
+  taken?: boolean;
+  image: ResponsiveImage | null;
+}
+
+interface Props {
+  kind: 'featured' | 'gallery' | 'flash';
+  items: Item[];
+}
+
+const { kind, items } = Astro.props;
+const flash = kind === 'flash';
+const t = flash
+  ? { noun: 'design', a: 'Name', b: 'Note (optional)', add: 'Upload a design', heading: 'New design', submit: 'Add design', edit: 'Edit design', aMax: 80, bMax: 40 }
+  : { noun: 'piece', a: 'Title', b: 'Placement', add: 'Upload a piece', heading: kind === 'gallery' ? 'New gallery piece' : 'New featured piece', submit: 'Add piece', edit: 'Edit piece', aMax: 80, bMax: 60 };
+const accept = 'image/jpeg,image/png,image/webp,image/heic,.heic';
+const last = items.length - 1;
+
+const pencil = 'M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4';
+const trash = 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6';
+---
+
+<div data-collection={kind} data-noun={t.noun}>
+  {items.length === 0 && <p class="a-empty" data-empty>Nothing here yet. Upload your first {t.noun} below.</p>}
+  <ol class="a-list" data-list>
+    {items.map((it, i) => (
+      <li class:list={['a-item', it.taken && 'is-taken']} data-id={it.id} data-a={it.a} data-b={it.b}>
+        <div class="a-item-top">
+          <div class="a-thumb" data-thumb>
+            {it.image ? <Img image={it.image} alt="" sizes="72px" /> : <span class="a-thumb-empty" aria-hidden="true"></span>}
+          </div>
+          <div class="a-item-text">
+            <h2 class="a-item-name" data-a-text>{it.a || `Untitled ${t.noun}`}</h2>
+            <p class="a-item-sub" data-b-text>{it.b}</p>
+            {kind === 'featured' && <span class="a-tag tone-line a-big">Big panel</span>}
+          </div>
+          <button class="a-icon" type="button" data-act="edit" aria-label={`Edit ${it.a}`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d={pencil} /></svg>
+          </button>
+        </div>
+        <div class="a-item-bar">
+          {flash && (
+            <div class="a-seg" role="group" aria-label={`Status of ${it.a}`}>
+              <button type="button" data-act="taken" data-value="0" aria-pressed={!it.taken}>Available</button>
+              <button type="button" data-act="taken" data-value="1" aria-pressed={!!it.taken}>Taken</button>
+            </div>
+          )}
+          <div class="a-item-tools">
+            <button class="a-icon" type="button" data-act="up" aria-label={`Move ${it.a} up`} disabled={i === 0}>▲</button>
+            <button class="a-icon" type="button" data-act="down" aria-label={`Move ${it.a} down`} disabled={i === last}>▼</button>
+            <button class="a-icon a-icon-danger" type="button" data-act="delete" aria-label={`Delete ${it.a}`}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={trash} /></svg>
+            </button>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <div class="a-dock">
+    <button class="a-btn a-btn-red a-btn-block" type="button" data-act="add"><span aria-hidden="true">+</span>{t.add}</button>
+  </div>
+
+  <dialog class="a-dialog a-sheet" aria-labelledby="form-h" data-form-dialog>
+    <form data-form novalidate>
+      <div class="a-dialog-head">
+        <h2 id="form-h" data-heading-add={t.heading} data-heading-edit={t.edit}>{t.heading}</h2>
+        <button class="a-icon" type="button" data-close aria-label="Close">✕</button>
+      </div>
+
+      <div class="a-field" data-photo>
+        <span class="a-field-label">Photo</span>
+        <div class="a-filebox" data-filebox hidden>
+          <img data-preview alt="" width="56" height="56" />
+          <div>
+            <strong data-fname></strong>
+            <span data-fsize></span>
+          </div>
+        </div>
+        <p class="a-error" id="photo-err" data-ferror aria-live="polite"></p>
+        <label class="a-btn a-btn-ghost a-file-btn">
+          <input class="visually-hidden" type="file" name="photo" accept={accept} aria-describedby="photo-err photo-hint" />
+          <span data-flabel>Take or choose a photo</span>
+        </label>
+        <p class="a-hint" id="photo-hint">JPG, PNG, WebP or HEIC, up to 15 MB. Location data is removed.</p>
+      </div>
+
+      <div class="a-field">
+        <label class="a-field-label" for="f-a">{t.a}</label>
+        <input class="a-input" id="f-a" name="a" maxlength={t.aMax} required autocomplete="off" />
+      </div>
+      <div class="a-field">
+        <label class="a-field-label" for="f-b">{t.b}</label>
+        <input class="a-input" id="f-b" name="b" maxlength={t.bMax} autocomplete="off" placeholder={flash ? 'Palm-sized' : 'Forearm'} />
+      </div>
+      {flash && (
+        <fieldset class="a-field a-fieldset">
+          <legend class="a-field-label">Status</legend>
+          <div class="a-seg" data-status>
+            <button type="button" data-value="0" aria-pressed="true">Available</button>
+            <button type="button" data-value="1" aria-pressed="false">Taken</button>
+          </div>
+        </fieldset>
+      )}
+
+      <p class="a-error" data-form-error aria-live="polite"></p>
+      <button class="a-btn a-btn-red a-btn-block" type="submit" data-submit data-label-add={t.submit} data-label-edit="Save changes">{t.submit}</button>
+    </form>
+  </dialog>
+
+  <dialog class="a-dialog a-confirm" role="alertdialog" aria-labelledby="del-h" aria-describedby="del-d" data-delete-dialog>
+    <div class="a-confirm-head">
+      <div class="a-thumb" data-del-thumb></div>
+      <h2 id="del-h">Delete "<span data-del-name></span>"?</h2>
+    </div>
+    <p id="del-d">It comes off the site right away and the photo is deleted. This can’t be undone.</p>
+    <p class="a-error" data-del-error aria-live="polite"></p>
+    <button class="a-btn a-btn-red a-btn-block" type="button" data-del-yes>Delete it</button>
+    <button class="a-btn a-btn-ghost a-btn-block" type="button" data-del-no autofocus>Keep it</button>
+  </dialog>
+</div>
+
+<script>
+  import { init } from './collection';
+  init();
+</script>

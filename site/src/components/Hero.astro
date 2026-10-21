@@ -1,0 +1,176 @@
+---
+---
+
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="speed-lines" aria-hidden="true"></div>
+  <div class="disc" aria-hidden="true"></div>
+  <div class="kanji" aria-hidden="true">刺青師</div>
+  <div class="hero-inner">
+    <h1 class="wordmark" id="hero-title">
+      <span>HALE</span>
+      <span class="boy">BOY</span>
+      <span class="slash" aria-hidden="true"><span class="slash-red"></span></span>
+    </h1>
+    <div class="hero-foot">
+      <div class="intro">
+        <p>Anime, video game and new school tattoos. Custom pieces and flash, drawn for you in Maryville, Tennessee.</p>
+        <div class="actions">
+          <a class="btn btn-red" href="#book">Book a session</a>
+          <a class="btn btn-ghost" href="#work">See the work</a>
+        </div>
+      </div>
+      <a class="ig" href="https://www.instagram.com/haleboy.tattoos" target="_blank" rel="noopener">@haleboy.tattoos on Instagram<span class="visually-hidden"> (opens in a new tab)</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Desktop geometry comes from the 1440px design; 1cqw = 14.4px of hero width.
+     The padding lives on .hero-inner so cqw resolves against the full hero width. */
+  .hero {
+    container-type: inline-size;
+    position: relative;
+    /* Clip top/bottom only so the rays and slash can bleed past the .page column. */
+    clip-path: inset(0 -100vmax);
+    /* Distance from the hero's side to the viewport edge on screens wider than --max. */
+    --bleed: max(0px, 50vw - 50cqw);
+  }
+  .hero-inner {
+    position: relative;
+    padding: 6.667cqw var(--gutter) 48px;
+  }
+
+  .speed-lines {
+    position: absolute;
+    inset: 0 calc(-1 * var(--bleed));
+    /* Ray center stays at 72% of the hero, not of the wider bleed box. */
+    --cx: calc(var(--bleed) + 72cqw);
+    background: repeating-conic-gradient(from 0deg at var(--cx) 46%, rgb(244 242 238 / 0.07) 0deg 1.2deg, transparent 1.2deg 6deg);
+    transform-origin: var(--cx) 46%;
+  }
+  .disc {
+    position: absolute;
+    left: 51.389cqw;
+    top: 4.167cqw;
+    width: 41.667cqw;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  .kanji {
+    position: absolute;
+    left: 79.861cqw;
+    top: 7.639cqw;
+    writing-mode: vertical-rl;
+    font-family: var(--font-display);
+    font-size: 8.056cqw;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    color: var(--black);
+  }
+
+  .wordmark {
+    position: relative;
+    margin: 0 0 0 -8px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 17.361cqw;
+    line-height: 0.86;
+    letter-spacing: -0.01em;
+    color: var(--bone);
+  }
+  .wordmark > span:not(.slash) { display: block; }
+  .boy { padding-left: 0.72em; }
+
+  /* The katana cut: a black band with a red edge, drawn left to right on load. */
+  .slash {
+    position: absolute;
+    left: calc(-1 * var(--gutter) - 4.167cqw);
+    top: 0.888em;
+    /* Extended along its own angle by the bleed on both ends, so the cut line through the letters is unchanged. */
+    --ext: calc(var(--bleed) * 1.02 + 8px);
+    width: calc(111.111cqw + 2 * var(--ext));
+    height: 14px;
+    background: var(--black);
+    transform: rotate(-9deg) translateX(calc(-1 * var(--ext)));
+    transform-origin: left center;
+  }
+  .slash-red {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 6px;
+    height: 3px;
+    background: var(--red);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .slash { animation: slash 0.7s cubic-bezier(0.7, 0, 0.2, 1) 0.2s both; }
+    /* Rays burst out from the disc as the slash lands. */
+    .speed-lines { animation: rays 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.45s both; }
+  }
+  @keyframes rays {
+    from { opacity: 0; transform: scale(0.6) rotate(-8deg); }
+  }
+  @keyframes slash {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+
+  .hero-foot {
+    position: relative;
+    margin-top: 64px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px 32px;
+  }
+  .intro {
+    width: 560px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .intro p {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.55;
+    color: var(--bone);
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 16px; }
+  .ig {
+    margin-left: auto;
+    font-size: 16px;
+    color: var(--ash);
+    text-decoration: none;
+  }
+  .ig:hover { color: var(--bone); }
+
+  @media (max-width: 899.98px) {
+    .hero-inner { padding-top: 64px; }
+    .disc {
+      left: auto;
+      right: -8cqw;
+      top: 28px;
+      width: 64cqw;
+    }
+    .kanji {
+      left: auto;
+      right: max(24px, 6.5cqw);
+      top: 72px;
+      font-size: clamp(44px, 8cqw, 72px);
+    }
+    .wordmark { font-size: clamp(60px, 18.5cqw, 170px); margin-left: -4px; }
+    .hero-foot { margin-top: 48px; }
+    .intro p { font-size: 18px; }
+  }
+
+  @media (max-width: 479.98px) {
+    .hero-inner { padding-top: 56px; }
+    .disc { right: -10cqw; top: 24px; width: 68cqw; }
+    .hero-foot { margin-top: 40px; }
+    .actions > .btn { flex: 1 1 auto; text-align: center; padding-left: 16px; padding-right: 16px; }
+    .ig { margin-left: 0; }
+  }
+</style>

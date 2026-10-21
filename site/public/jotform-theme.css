@@ -1,0 +1,157 @@
+/*
+  Haleboy theme for Jotform card form 250787056108157.
+  Paste into: Form Builder > Form Designer (paint roller) > Styles > Inject custom CSS.
+  Steps: site/docs/jotform-theme.md.
+  Mirrors the booking panel in the approved design (Main.dc.html #book).
+  !important is needed: the Jotform theme stylesheet has equal or higher specificity.
+*/
+@import url("https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap");
+
+:root {
+  --black: #000000; --bone: #F4F2EE; --red: #C8102E; --ash: #C9C6C1;
+  --ash-dim: #A8A5A0; --ink: #2A2A2A; --field-border: #5A5753;
+}
+
+/* Page and background: flat black, no photo, no gradient */
+html, body, body.jfCardForm,
+.jfForm-backgroundContainer, .jfForm-backgroundUnderlay, .jfForm-background,
+.formMode .jfForm-backgroundContainer, .welcomeMode .jfForm-backgroundContainer,
+.thankyouMode .jfForm-backgroundContainer, .reviewMode .jfForm-backgroundContainer {
+  background: var(--black) !important;
+  background-image: none !important;
+}
+.jfForm-backgroundOverlay, .jfThankYou-wrapper:before, .cf-minimal .jfForm-background-mask { background: transparent !important; }
+#cardform-header-icon, .jfForm-logo { display: none !important; }
+
+body.jfCardForm, body.jfCardForm input, body.jfCardForm textarea, body.jfCardForm select, body.jfCardForm button {
+  font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif !important;
+  color: var(--bone);
+}
+
+/* Card = the design form panel: black, 3px bone border, square */
+.jfCard, .formMode.forMiniCard .jfCard {
+  background: var(--black) !important;
+  border: 3px solid var(--bone) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.jfCard-question, .jfReview-content { background: var(--black) !important; border-radius: 0 !important; padding: 40px !important; }
+.jfCard-index { color: var(--red) !important; font-family: "Dela Gothic One", sans-serif !important; }
+
+.jfQuestion-label, .jfQuestion-label .jfQuestionLabelContainer {
+  color: var(--bone) !important;
+  font-family: "Dela Gothic One", sans-serif !important;
+  font-weight: 400 !important; line-height: 1.15 !important;
+}
+/* Dela Gothic One ships one weight: stop faux-bold and glyph effects */
+.jfQuestion-label *, .jfWelcome-header, .jfThankYou-header, .jfCard-index * {
+  font-weight: 400 !important; font-synthesis: none !important;
+  text-shadow: none !important; -webkit-text-stroke: 0 !important;
+}
+.jfQuestion-description, .jfInput-inputLabel { color: var(--ash) !important; font-size: 15px !important; line-height: 1.6 !important; }
+.jfField-sublabel { color: var(--ash) !important; font-size: 15px !important; }
+.jfRequiredStar { color: var(--red) !important; }
+.jfRequiredStar-message, .jfCard-mobileError { background: var(--black) !important; color: var(--bone) !important; border: 1px solid var(--red) !important; border-radius: 0 !important; }
+
+/* Inputs: 50px, black, field border, bone text, square */
+.jfInput-input, .jfInput-textarea, .jfTextarea-editor[contenteditable], .jfInput-dropdown,
+body.isMobile .jfForm-wrapper.hasTouch select.form-dropdown, body.isTablet .jfForm-wrapper.hasTouch select.form-dropdown {
+  background: var(--black) !important;
+  border: 1px solid var(--field-border) !important;
+  border-radius: 0 !important;
+  color: var(--bone) !important;
+  font-size: 17px !important;
+  box-shadow: none !important;
+}
+.jfInput-input { min-height: 50px !important; padding: 0 14px !important; }
+.jfInput-textarea { padding: 14px !important; }
+.jfInput-input::placeholder, .jfInput-textarea::placeholder { color: var(--ash-dim) !important; opacity: 1 !important; }
+.jfInput-input:focus, .jfInput-textarea:focus,
+.jfInput-input:not(:read-only):focus, .jfInput-textarea:not(:read-only):focus {
+  border-color: var(--bone) !important;
+  outline: 2px solid var(--red) !important; outline-offset: 2px !important;
+}
+.jfInput-input.form-validation-error, .jfInput-textarea.form-validation-error { border-color: var(--red) !important; }
+.form-line.form-line-error .jfQuestion-label { color: var(--bone) !important; }
+
+/* Radio and checkbox options */
+.jfRadio-label, .jfCheckbox-label { border: 1px solid var(--field-border) !important; border-radius: 0 !important; background: var(--black) !important; }
+.jfRadio-label:hover, .jfCheckbox-label:hover { background: var(--ink) !important; }
+.jfRadio-labelText, .jfCheckbox-labelText { color: var(--bone) !important; }
+.jfRadio-customInput, .jfCheckbox-customInput { border-color: var(--ash-dim) !important; background: var(--black) !important; border-radius: 0 !important; }
+.jfRadio-customInputIcon, .jfCheckbox-customInputIcon { background-color: var(--red) !important; }
+.jfRadio-input:checked ~ .jfRadio-label, .jfCheckbox-input:checked ~ .jfCheckbox-label { border-color: var(--red) !important; }
+.jfRadio-input:checked ~ .jfRadio-label .jfRadio-customInput,
+.jfCheckbox-input:checked ~ .jfCheckbox-label .jfCheckbox-customInput { border-color: var(--red) !important; }
+.jfRadio-input:focus-visible ~ .jfRadio-label, .jfCheckbox-input:focus-visible ~ .jfCheckbox-label { outline: 2px solid var(--red) !important; outline-offset: 2px !important; }
+
+/* File upload */
+.jfUpload-wrapper .jfUpload-container { background: var(--black) !important; border: 1px dashed var(--field-border) !important; border-radius: 0 !important; }
+.jfUpload-wrapper .jfUpload-heading, .qq-upload-file { color: var(--bone) !important; }
+.jfUpload-subheading, .jfUpload-subheading span { color: var(--ash) !important; }
+.jfUpload-button { background: transparent !important; color: var(--bone) !important; border: 1px solid var(--bone) !important; border-radius: 0 !important; font-weight: 700 !important; }
+
+/* Buttons: black action bar; Next, Submit, Start use the design red Send request style */
+.jfCard-actions, .formMode.forMiniCard .jfProgress { background: var(--black) !important; border-radius: 0 !important; border-top: 1px solid var(--ink) !important; }
+.jfInput-button, .jfWelcome-button, .jfHeading-button { border-radius: 0 !important; font-weight: 700 !important; font-size: 18px !important; }
+.jfInput-button.forNext, .jfInput-button.forNext-heading,
+.jfInput-button.form-submit-button, .jfInput-button.forReview, .jfInput-button.forReviewButton,
+.jfWelcome-button, .jfHeading-button,
+.cf-minimal.sectionHeaderMode .jfWelcome-wrapper.isHeader .jfWelcome-buttonWrapper .jfWelcome-button {
+  background: var(--red) !important; color: var(--bone) !important; border: none !important;
+}
+.jfInput-button.forNext:hover, .jfInput-button.form-submit-button:hover, .jfWelcome-button:hover { background: #A50D26 !important; }
+.jfInput-button.forPrev, .jfInput-button.forPrev-heading, .jfInput-button.forBackToForm {
+  background: transparent !important; color: var(--ash) !important; border: 1px solid var(--field-border) !important;
+}
+.jfInput-button:focus-visible, .jfWelcome-button:focus-visible, .jfUpload-button:focus-visible {
+  outline: 2px solid var(--bone) !important; outline-offset: 3px !important; box-shadow: none !important;
+}
+.jfWelcome-buttonWrapper, .jfWelcome-wrapper.isHeader .jfWelcome-buttonWrapper { border-radius: 0 !important; }
+
+/* Welcome and thank-you screens */
+.jfWelcome-header, .jfHeading-header, .jfThankYou-header, .emptyNotification-header {
+  color: var(--bone) !important; font-family: "Dela Gothic One", sans-serif !important; font-weight: 400 !important;
+}
+.jfWelcome-description, .jfHeading-description, .jfThankYou-description,
+.jfWelcome-sectionInfo, .jfThankYou-sectionInfo { color: var(--ash) !important; }
+
+/* Progress and errors */
+.jfProgress-info, .jfProgress-formError, .jfProgress .jfProgress-infoContent { color: var(--bone) !important; background: transparent !important; }
+.formMode.forMiniCard .jfProgressLine, .jfProgress-itemWrapperLine { background: var(--ink) !important; }
+.formMode.forMiniCard .jfProgressLine-inner, .jfProgress-item.isActive .jfProgress-itemCircle,
+.jfProgress-item.isValid .jfProgress-itemCircle { background: var(--red) !important; border-color: var(--red) !important; }
+
+.jfReview .jfReviewItem-header, .jfReview .jfFormHeader { color: var(--ash) !important; }
+.jfReview .jfReviewItem-answer { color: var(--bone) !important; }
+
+/* Classic (all-questions-on-one-page) layout, in case the form is switched from Card to Classic */
+.form-all { background: var(--black) !important; color: var(--bone) !important; border: 3px solid var(--bone) !important; border-radius: 0 !important; box-shadow: none !important; }
+.form-header, .form-label, .form-label-top, .form-label-left { color: var(--bone) !important; }
+.form-header { font-family: "Dela Gothic One", sans-serif !important; font-weight: 400 !important; }
+.form-sub-label, .form-description-content { color: var(--ash) !important; }
+.form-textbox, .form-textarea, .form-dropdown {
+  background: var(--black) !important; color: var(--bone) !important;
+  border: 1px solid var(--field-border) !important; border-radius: 0 !important; box-shadow: none !important;
+}
+.form-textbox:focus, .form-textarea:focus, .form-dropdown:focus { border-color: var(--bone) !important; outline: 2px solid var(--red) !important; outline-offset: 2px !important; }
+.form-line-error .form-textbox, .form-line-error .form-textarea, .form-line-error .form-dropdown { border-color: var(--red) !important; }
+.form-error-message { background: var(--bone) !important; color: var(--black) !important; border-left: 4px solid var(--red) !important; border-radius: 0 !important; }
+.form-submit-button {
+  background: var(--red) !important; color: var(--bone) !important; border: none !important;
+  border-radius: 0 !important; font-weight: 700 !important; font-size: 18px !important; min-height: 56px !important;
+}
+.form-submit-button:hover { background: #A50D26 !important; }
+.form-submit-button:focus-visible { outline: 2px solid var(--bone) !important; outline-offset: 3px !important; }
+
+/* Phones: one column, full-width buttons */
+@media (max-width: 479.98px) {
+  .jfCard-question, .jfReview-content { padding: 20px 16px !important; }
+  .jfCard-actions, .jfCard-actionsNotification { flex-direction: column !important; gap: 12px !important; }
+  .jfInput-button, .jfWelcome-button, .form-submit-button { width: 100% !important; }
+  .jfField, .form-sub-label-container { width: 100% !important; display: block !important; margin-right: 0 !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

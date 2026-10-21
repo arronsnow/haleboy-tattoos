@@ -1,0 +1,79 @@
+---
+import { env } from 'cloudflare:workers';
+import Admin from '../../layouts/Admin.astro';
+import { CONTENT_FIELDS, getContent, type ContentKey } from '../../lib/content';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const content = await getContent(env.DB);
+const GROUP_NOTES: Record<string, string> = {
+  About: 'The section next to your portrait.',
+  Booking: 'Step 二 of “Book a session”.',
+  Shop: 'The footer, and what Google shows for the shop.',
+};
+const groups = new Map<string, ContentKey[]>();
+for (const k of Object.keys(CONTENT_FIELDS) as ContentKey[]) {
+  const g = CONTENT_FIELDS[k].group;
+  groups.set(g, [...(groups.get(g) ?? []), k]);
+}
+---
+
+<Admin title="Site text" back>
+  <p class="a-lede" slot="lede">The words on the site. Save, and the site shows them right away.</p>
+
+  <form class="a-content" data-content-form novalidate>
+    {[...groups].map(([group, keys], gi) => (
+      <section class="a-card a-group" aria-labelledby={`g-${gi}`}>
+        <div class="a-group-head">
+          <h2 id={`g-${gi}`}>{group}</h2>
+          <p class="a-muted">{GROUP_NOTES[group]}</p>
+        </div>
+        <div class="a-group-body">
+          {keys.map((k) => {
+            const f = CONTENT_FIELDS[k];
+            const hint = 'hint' in f ? f.hint : undefined;
+            return (
+              <div class="a-field">
+                <label class="a-field-label" for={`c-${k}`}>{f.label}</label>
+                {f.multiline ? (
+                  <textarea class="a-input a-textarea" id={`c-${k}`} name={k} maxlength={f.max} rows={k === 'hours' ? 3 : 4} aria-describedby={hint && `c-${k}-hint`}>{content[k]}</textarea>
+                ) : (
+                  <input class="a-input" id={`c-${k}`} name={k} value={content[k]} maxlength={f.max} autocomplete="off" aria-describedby={hint && `c-${k}-hint`} />
+                )}
+                {hint && <p class="a-hint" id={`c-${k}-hint`}>{hint}</p>}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+
+    <p class="a-error" data-form-error aria-live="polite"></p>
+    <div class="a-dock">
+      <button class="a-btn a-btn-red a-btn-block" type="submit" data-submit>Save changes</button>
+    </div>
+  </form>
+</Admin>
+
+<script>
+  import { announce, api } from '../../components/admin/ui';
+
+  const form = document.querySelector<HTMLFormElement>('[data-content-form]')!;
+  const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+  const error = form.querySelector<HTMLElement>('[data-form-error]')!;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    error.textContent = '';
+    submit.disabled = true;
+    submit.textContent = 'Saving…';
+    try {
+      await api('/api/admin/content', { method: 'PUT', json: Object.fromEntries(new FormData(form)) });
+      announce('Saved. The site shows the new text now.');
+    } catch (err) {
+      error.textContent = (err as Error).message;
+    }
+    submit.disabled = false;
+    submit.textContent = 'Save changes';
+  });
+</script>

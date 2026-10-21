@@ -1,0 +1,15 @@
+---
+import { env } from 'cloudflare:workers';
+import Admin from '../../layouts/Admin.astro';
+import ItemList from '../../components/admin/ItemList.astro';
+import { getFlash } from '../../lib/feed';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const items = (await getFlash(env)).map((f) => ({ id: f.id, a: f.name, b: f.price, taken: f.taken, image: f.image }));
+---
+
+<Admin title="Designs" back>
+  <p class="a-lede" slot="lede"><span data-count>{items.length} design{items.length === 1 ? '' : 's'}</span>. Taken ones stay on the sheet, marked "Taken".</p>
+  <ItemList kind="flash" items={items} />
+</Admin>

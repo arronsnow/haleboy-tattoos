@@ -1,0 +1,21 @@
+---
+import { env } from 'cloudflare:workers';
+import Admin from '../../layouts/Admin.astro';
+import ItemList from '../../components/admin/ItemList.astro';
+import { listFeatured } from '../../lib/db';
+import { responsiveImage } from '../../lib/images';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const items = (await listFeatured(env.DB)).map((f) => ({
+  id: f.id,
+  a: f.title,
+  b: f.placement,
+  image: f.r2_key && f.width && f.height ? responsiveImage(f.r2_key, f.width, f.height) : null,
+}));
+---
+
+<Admin title="Featured pieces" back>
+  <p class="a-lede a-callout" slot="lede">Shown in "The work" only when Instagram can’t load. The first one fills the big panel.</p>
+  <ItemList kind="featured" items={items} />
+</Admin>

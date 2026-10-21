@@ -1,0 +1,101 @@
+---
+import { lines, telHref, type Content } from '../lib/content';
+import { INSTAGRAM_URL } from '../lib/feed';
+
+interface Props {
+  content: Content;
+}
+
+const { content: c } = Astro.props;
+const address = [c.address_street, c.address_city].filter(Boolean);
+---
+
+<footer class="site-footer">
+  <div class="ghost" aria-hidden="true">侍</div>
+  <div class="brand">
+    <div class="name">HALEBOY</div>
+    <a href={INSTAGRAM_URL} target="_blank" rel="noopener">@haleboy.tattoos<span class="visually-hidden"> on Instagram (opens in a new tab)</span></a>
+  </div>
+  <div class="info">
+    <div>
+      <h2>Find the shop</h2>
+      <a href="https://iloveyou.tattoo/" target="_blank" rel="noopener">I Love You Tattoo<span class="visually-hidden"> (opens in a new tab)</span></a>{address.map((l) => <><br />{l}</>)}{c.phone && <><br /><a href={telHref(c.phone)}>{c.phone}</a></>}
+    </div>
+    <div>
+      <h2>Hours</h2>
+      {lines(c.hours).map((l, i) => <>{i > 0 && <br />}{l}</>)}
+    </div>
+  </div>
+  <a class="admin" href="/admin" aria-label="Admin">
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+    </svg>
+  </a>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    overflow: hidden;
+    padding: 72px var(--gutter);
+    border-top: 3px solid var(--red);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px 48px;
+  }
+  .ghost {
+    position: absolute;
+    right: 60px;
+    top: 10px;
+    font-family: var(--font-display);
+    font-size: 300px;
+    line-height: 1;
+    color: #141414;
+  }
+  .brand, .info { position: relative; }
+  .brand { display: flex; flex-direction: column; gap: 14px; }
+  .name {
+    font-family: var(--font-display);
+    font-size: 40px;
+    letter-spacing: 0.06em;
+  }
+  .brand a { font-size: 17px; color: var(--bone); }
+  .info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 220px));
+    gap: 48px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ash);
+  }
+  h2 { margin: 0; font-size: 16px; font-weight: 700; color: var(--bone); }
+  .info a { color: var(--ash); }
+  .info a:hover { color: var(--bone); }
+
+  .admin {
+    position: absolute;
+    right: calc(var(--gutter) - 12px);
+    bottom: 12px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ash-dim);
+  }
+  .admin:hover, .admin:focus-visible { color: var(--red); }
+
+  @media (max-width: 899.98px) {
+    .ghost { right: 20px; font-size: 220px; }
+  }
+
+  @media (max-width: 479.98px) {
+    .site-footer { flex-direction: column; padding-top: 56px; padding-bottom: 72px; }
+    .ghost { right: -10px; font-size: 180px; }
+    .name { font-size: 32px; }
+    .info { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  }
+</style>

@@ -1,0 +1,61 @@
+---
+import '../styles/fonts.css';
+import '../styles/global.css';
+import '../styles/admin.css';
+
+interface Props {
+  title: string;
+  /** Shows the "← Admin" link above the page title. */
+  back?: boolean;
+  /** Page h1, when it differs from the <title>. */
+  heading?: string;
+}
+
+const { title, back = false, heading } = Astro.props;
+const nav = [
+  ['/admin', 'Home'],
+  ['/admin/gallery', 'Gallery'],
+  ['/admin/flash', 'Designs'],
+  ['/admin/featured', 'Featured'],
+  ['/admin/content', 'Site text'],
+  ['/admin/portrait', 'Portrait'],
+  ['/admin/instagram', 'Instagram'],
+];
+const here = Astro.url.pathname.replace(/\/$/, '') || '/admin';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#000000" />
+    <title>{title} | Haleboy admin</title>
+  </head>
+  <body class="admin">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="a-header">
+      <a class="a-brand" href="/admin">
+        <span class="a-mark" aria-hidden="true">侍</span>
+        <span class="a-name">HALEBOY</span>
+        <span class="a-label">Admin</span>
+      </a>
+      <a class="a-view" href="/">View site</a>
+    </header>
+    <nav class="a-nav" aria-label="Admin sections">
+      {nav.map(([href, label]) => <a href={href} aria-current={here === href ? 'page' : undefined}>{label}</a>)}
+    </nav>
+    <main id="main" class="a-main" tabindex="-1">
+      {back && <a class="a-back" href="/admin"><span aria-hidden="true">←</span> Admin</a>}
+      <h1 class="a-title">{heading ?? title}</h1>
+      <slot name="lede" />
+      <div class="a-notice" id="notice" role="status" aria-live="polite"></div>
+      <slot />
+    </main>
+    <script>
+      import { showStashedNotice } from '../components/admin/ui';
+      showStashedNotice();
+    </script>
+  </body>
+</html>

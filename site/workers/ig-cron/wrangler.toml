@@ -1,0 +1,27 @@
+# Hourly Instagram sync. Deploy with `npm run deploy:ig-cron`.
+# Bindings must point at the same D1/R2/KV as ../../wrangler.toml: copy the IDs over when you set those.
+# Secret: `npx wrangler secret put IG_INITIAL_TOKEN --config workers/ig-cron/wrangler.toml`
+name = "haleboy-ig-cron"
+main = "index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "haleboy"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "haleboy-media"
+
+[[kv_namespaces]]
+binding = "IG_CACHE"
+id = "00000000000000000000000000000000"
+
+[images]
+binding = "IMAGES"
+
+[triggers]
+crons = ["0 * * * *"]

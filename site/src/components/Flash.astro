@@ -1,0 +1,155 @@
+---
+import type { FlashItem } from '../lib/feed';
+import Img from './Img.astro';
+
+interface Props {
+  items: FlashItem[];
+}
+
+const { items } = Astro.props;
+const sizes = '(max-width: 759.98px) 45vw, (max-width: 899.98px) 30vw, 300px';
+---
+
+<section class="flash band" id="designs" aria-labelledby="designs-title">
+  <div class="intro">
+    <div class="mark" aria-hidden="true">図案</div>
+    <h2 class="title" id="designs-title">Designs</h2>
+    <p>Original designs, drawn and ready to tattoo. Pricing depends on size and placement, so send the one you like and get a quote.</p>
+    <a class="claim" href="#book">Ask about a design</a>
+  </div>
+
+  <ul class="sheet">
+    {items.map((f) => (
+      <li class:list={['card', { taken: f.taken }]}>
+        {f.taken && <span class="badge">Taken</span>}
+        {f.image ? (
+          <button class="zoom" type="button" data-zoom data-caption={[f.name, f.price, f.taken && 'Taken'].filter(Boolean).join(' · ')}>
+            <Img class="art" image={f.image} alt={`Design: ${f.name}`} sizes={sizes} />
+            <span class="visually-hidden"> (view larger)</span>
+          </button>
+        ) : (
+          <span class="empty">[Design]</span>
+        )}
+        <div class="meta"><span>{f.name}</span><span>{f.price}</span></div>
+      </li>
+    ))}
+    <li class="card drop">New sheet drops on Instagram first.</li>
+  </ul>
+</section>
+
+<style>
+  .flash {
+    padding: 112px var(--gutter);
+    --band: var(--red);
+    color: var(--black);
+    display: grid;
+    grid-template-columns: 440px minmax(0, 1fr);
+    gap: 72px;
+  }
+  .intro { display: flex; flex-direction: column; gap: 24px; }
+  .mark, .title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1;
+  }
+  .mark { font-size: 120px; }
+  .title { margin: 0; font-size: 72px; }
+  /* Bold so black on red reads as large text (3:1); regular 20px would miss 4.5:1. */
+  .intro p { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.6; max-width: 400px; }
+  .claim {
+    align-self: flex-start;
+    text-decoration: none;
+    background: var(--black);
+    color: var(--bone);
+    padding: 16px 28px;
+    font-size: 17px;
+    font-weight: 700;
+  }
+  .claim:hover { color: var(--bone); }
+  .claim:focus-visible, .flash :focus-visible { outline-color: var(--black); }
+
+  .sheet {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .card {
+    position: relative;
+    background: var(--bone);
+    border: 3px solid var(--black);
+    height: 250px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .badge { position: absolute; top: 12px; right: 12px; z-index: 1; }
+  .empty { font-size: 15px; color: #4A4744; }
+  .card :global(.art) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: contain;
+  }
+  .zoom {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+  .zoom :global(picture) { flex: 1; min-height: 0; display: flex; }
+  .zoom :global(.art) { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .zoom:hover :global(.art) { transform: scale(1.04); }
+  @media (prefers-reduced-motion: reduce) {
+    .zoom :global(.art) { transition: none; }
+  }
+  .taken :global(.art) { opacity: 0.45; }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .drop {
+    background: var(--black);
+    color: var(--bone);
+    justify-content: flex-end;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 1180px) {
+    .flash { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 48px; }
+    .sheet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 899.98px) {
+    .flash { grid-template-columns: minmax(0, 1fr); padding-top: 88px; padding-bottom: 88px; }
+    .mark { font-size: 88px; }
+    .title { font-size: 56px; }
+    .sheet { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 759.98px) {
+    .sheet { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .card { height: 220px; padding: 14px; }
+  }
+
+  @media (max-width: 479.98px) {
+    .flash { padding-top: 64px; padding-bottom: 64px; gap: 40px; }
+    .mark { font-size: 72px; }
+    .title { font-size: 40px; }
+    .meta { flex-direction: column; gap: 2px; font-size: 15px; }
+    .drop { font-size: 15px; }
+  }
+</style>

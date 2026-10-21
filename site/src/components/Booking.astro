@@ -1,0 +1,83 @@
+---
+import type { Content } from '../lib/content';
+import BookingForm from './BookingForm.astro';
+
+interface Props {
+  content: Content;
+}
+
+const { content } = Astro.props;
+const deposit = content.deposit.trim() || 'A deposit';
+
+const steps = [
+  { mark: '一', title: 'Send your idea', body: 'Characters, references, rough size and where it goes.' },
+  { mark: '二', title: 'Get a quote and a date', body: `Haleboy replies with a price range and open days. ${deposit} holds your spot.` },
+  { mark: '三', title: 'Sit for your tattoo', body: 'You see the final drawing before the needle touches skin.' },
+];
+---
+
+<section class="book band" id="book" aria-labelledby="book-title">
+  <div class="intro">
+    <h2 class="section-title" id="book-title">Book a session</h2>
+    <ol class="steps">
+      {steps.map((s) => (
+        <li>
+          <span class="mark" aria-hidden="true">{s.mark}</span>
+          <div>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+  <BookingForm />
+</section>
+
+<style>
+  .book {
+    padding: 120px var(--gutter);
+    --band: var(--grey);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 640px;
+    gap: 96px;
+  }
+  .intro { display: flex; flex-direction: column; gap: 48px; }
+  .steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .steps li { display: flex; gap: 24px; align-items: flex-start; }
+  .mark {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1;
+    color: var(--red);
+    width: 56px;
+    flex-shrink: 0;
+  }
+  .steps div { display: flex; flex-direction: column; gap: 6px; }
+  h3 { margin: 0; font-size: 21px; font-weight: 700; }
+  .steps p { margin: 0; font-size: 17px; line-height: 1.6; color: var(--ash); }
+
+  @media (max-width: 1180px) {
+    .book { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 56px; }
+  }
+
+  @media (max-width: 899.98px) {
+    .book { grid-template-columns: minmax(0, 1fr); padding-top: 88px; padding-bottom: 88px; }
+    .intro { gap: 40px; }
+  }
+
+  @media (max-width: 479.98px) {
+    .book { padding-top: 64px; padding-bottom: 64px; gap: 40px; }
+    .intro { gap: 32px; }
+    .steps { gap: 24px; }
+    .steps li { gap: 16px; }
+    .mark { font-size: 36px; width: 44px; }
+  }
+</style>

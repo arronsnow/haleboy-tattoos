@@ -1,0 +1,87 @@
+---
+import { env } from 'cloudflare:workers';
+import { Picture } from 'astro:assets';
+import Admin from '../../layouts/Admin.astro';
+import Img from '../../components/Img.astro';
+import { getPortraitImage } from '../../lib/feed';
+import eathan from '../../assets/eathan.jpg';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const portrait = await getPortraitImage(env);
+const alt = 'Current About portrait';
+const sizes = '(max-width: 519.98px) 77vw, 400px';
+---
+
+<Admin title="About portrait" back>
+  <p class="a-lede" slot="lede">Shows in the About section, over the red sun.</p>
+
+  <div class="a-portrait">
+    <div class="a-art">
+      <div class="a-disc" aria-hidden="true"></div>
+      <div class="a-frame">
+        {portrait ? (
+          <Img image={portrait} alt={alt} sizes={sizes} />
+        ) : (
+          <Picture src={eathan} alt={`${alt} (the default photo)`} formats={['avif', 'webp']} widths={[400, 600, 800]} sizes={sizes} />
+        )}
+      </div>
+    </div>
+
+    <div class="a-portrait-actions">
+      <label class="a-btn a-btn-red a-btn-block a-file-btn">
+        <input class="visually-hidden" type="file" id="portrait-file" accept="image/jpeg,image/png,image/webp,image/heic,.heic" aria-describedby="portrait-hint" />
+        <span data-label>Take or choose a photo</span>
+      </label>
+      <p class="a-hint" id="portrait-hint">JPG, PNG, WebP or HEIC, up to 15 MB. We resize it and remove location data.</p>
+      {portrait && <button class="a-btn a-btn-ghost a-btn-block" type="button" id="portrait-reset">Go back to the default photo</button>}
+    </div>
+  </div>
+</Admin>
+
+<script>
+  import { announce, api, checkPhoto, reloadWith } from '../../components/admin/ui';
+
+  const input = document.getElementById('portrait-file') as HTMLInputElement;
+  const label = input.closest('label')!;
+  const text = label.querySelector('[data-label]')!;
+  const reset = document.getElementById('portrait-reset') as HTMLButtonElement | null;
+
+  const busy = (on: boolean, msg = 'Take or choose a photo') => {
+    input.disabled = on;
+    label.classList.toggle('is-busy', on);
+    text.textContent = msg;
+    if (reset) reset.disabled = on;
+  };
+
+  input.addEventListener('change', async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+    const problem = checkPhoto(file);
+    input.value = ''; // lets him pick the same file again after an error
+    if (problem) return announce(problem, 'error');
+
+    busy(true, 'Uploading…');
+    announce('Uploading your photo…');
+    const body = new FormData();
+    body.append('photo', file);
+    try {
+      await api('/api/admin/portrait', { method: 'POST', body });
+      reloadWith('Saved. The site shows the new photo now.');
+    } catch (e) {
+      busy(false);
+      announce((e as Error).message, 'error');
+    }
+  });
+
+  reset?.addEventListener('click', async () => {
+    busy(true);
+    try {
+      await api('/api/admin/portrait', { method: 'DELETE' });
+      reloadWith('Saved. The site shows the default photo again.');
+    } catch (e) {
+      busy(false);
+      announce((e as Error).message, 'error');
+    }
+  });
+</script>

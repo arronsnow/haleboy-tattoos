@@ -1,0 +1,17 @@
+---
+import type { ResponsiveImage } from '../lib/images';
+
+interface Props {
+  image: ResponsiveImage;
+  alt: string;
+  sizes: string;
+  class?: string;
+}
+
+const { image, alt, sizes, class: className } = Astro.props;
+---
+
+<picture>
+  <source type="image/avif" srcset={image.avifSrcset} sizes={sizes} />
+  <img class={className} src={image.src} srcset={image.srcset} sizes={sizes} width={image.width} height={image.height} alt={alt} loading="lazy" decoding="async" />
+</picture>

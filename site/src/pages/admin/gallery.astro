@@ -1,0 +1,21 @@
+---
+import { env } from 'cloudflare:workers';
+import Admin from '../../layouts/Admin.astro';
+import ItemList from '../../components/admin/ItemList.astro';
+import { listGallery } from '../../lib/db';
+import { responsiveImage } from '../../lib/images';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const items = (await listGallery(env.DB)).map((g) => ({
+  id: g.id,
+  a: g.title,
+  b: g.placement,
+  image: g.r2_key && g.width && g.height ? responsiveImage(g.r2_key, g.width, g.height) : null,
+}));
+---
+
+<Admin title="Gallery" back>
+  <p class="a-lede" slot="lede"><span data-count>{items.length} piece{items.length === 1 ? '' : 's'}</span>. Your own portfolio, separate from Instagram. It shows on the site under "The work" once you add a piece.</p>
+  <ItemList kind="gallery" items={items} />
+</Admin>

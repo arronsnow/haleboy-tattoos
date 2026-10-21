@@ -1,0 +1,34 @@
+---
+interface Props {
+  label: string;
+  red?: boolean;
+}
+const { label, red = false } = Astro.props;
+---
+
+<button class:list={['a-btn', red ? 'a-btn-red' : 'a-btn-ghost', 'a-btn-block']} type="button" data-ig-refresh>{label}</button>
+
+<script>
+  import { announce, api, reloadWith } from './ui';
+
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-ig-refresh]')) {
+    btn.addEventListener('click', async () => {
+      const label = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Refreshing…';
+      announce('Refreshing Instagram. This can take a minute.');
+      try {
+        const s = await api<{ state: string; message?: string }>('/api/admin/instagram/refresh', { method: 'POST' });
+        reloadWith(
+          s.state === 'ok'
+            ? 'Instagram refreshed. The site shows your latest posts.'
+            : `Instagram still isn’t working: ${s.message ?? 'unknown error'}`,
+        );
+      } catch (e) {
+        announce((e as Error).message, 'error');
+        btn.disabled = false;
+        btn.textContent = label;
+      }
+    });
+  }
+</script>

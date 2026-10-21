@@ -1,0 +1,37 @@
+---
+import type { Content } from '../lib/content';
+import { INSTAGRAM_URL } from '../lib/feed';
+
+interface Props {
+  content: Content;
+}
+
+const { content: c } = Astro.props;
+const zip = c.address_city.match(/\b\d{5}\b/)?.[0];
+
+const data = {
+  '@context': 'https://schema.org',
+  '@type': 'TattooParlor',
+  name: 'I Love You Tattoo',
+  url: 'https://iloveyou.tattoo/',
+  telephone: c.phone || undefined,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: c.address_street || undefined,
+    addressLocality: 'Maryville',
+    addressRegion: 'TN',
+    postalCode: zip,
+    addressCountry: 'US',
+  },
+  // shortcut: hours here are fixed, not read from the editable "Hours" text; parse or add structured fields if the hours change.
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    opens: '12:00',
+    closes: '19:00',
+  },
+  sameAs: [INSTAGRAM_URL],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />

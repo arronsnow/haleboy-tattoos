@@ -1,0 +1,97 @@
+---
+import { env } from 'cloudflare:workers';
+import { Picture } from 'astro:assets';
+import Admin from '../../layouts/Admin.astro';
+import RefreshButton from '../../components/admin/RefreshButton.astro';
+import { ago, nextRun, statusTag, tokenLine } from '../../components/admin/ig';
+import { getPortrait, listFeatured, listFlash, listGallery } from '../../lib/db';
+import { getContent } from '../../lib/content';
+import { IG_FEED_KEY, IG_STATUS_KEY, type IgFeed, type IgStatus } from '../../lib/feed';
+import { responsiveImage } from '../../lib/images';
+import eathan from '../../assets/eathan.jpg';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const [status, feed, portrait, flash, featured, gallery, content] = await Promise.all([
+  env.IG_CACHE.get<IgStatus>(IG_STATUS_KEY, 'json'),
+  env.IG_CACHE.get<IgFeed>(IG_FEED_KEY, 'json'),
+  getPortrait(env.DB),
+  listFlash(env.DB),
+  listFeatured(env.DB),
+  listGallery(env.DB),
+  getContent(env.DB),
+]);
+const tag = statusTag(status);
+const taken = flash.filter((f) => f.taken).length;
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+---
+
+<Admin title="Admin" heading="Hey, Haleboy.">
+  <p class="a-lede" slot="lede">Changes show on the site as soon as you save.</p>
+
+  <div class="a-grid">
+    <section class:list={['a-card', tag.tone === 'bad' && 'is-bad']} aria-labelledby="ig-h">
+      <div class="a-card-head">
+        <h2 id="ig-h">Instagram</h2>
+        <span class:list={['a-tag', `tone-${tag.tone}`]}>{tag.label}</span>
+      </div>
+      <dl class="a-facts">
+        <div>
+          <dt>Last refresh</dt>
+          <dd>{feed ? `${ago(feed.updatedAt)} · ${plural(feed.posts.length, 'post')}` : 'Never'}</dd>
+        </div>
+        <div><dt>Next refresh</dt><dd>{nextRun()}</dd></div>
+        <div><dt>Token</dt><dd>{tag.tone === 'bad' ? 'Needs a new token' : tokenLine(status)}</dd></div>
+      </dl>
+      {tag.tone === 'ok' || tag.tone === 'none' ? (
+        <RefreshButton label="Refresh now" />
+      ) : (
+        <a class="a-btn a-btn-red a-btn-block" href="/admin/instagram">See what’s wrong</a>
+      )}
+      {tag.tone !== 'bad' && <a class="a-more" href="/admin/instagram">Status and refresh log<span aria-hidden="true">→</span></a>}
+    </section>
+
+    <section class="a-card" aria-labelledby="portrait-h">
+      <div class="a-card-media">
+        <div class="a-thumb a-thumb-portrait">
+          {portrait ? (
+            <img src={responsiveImage(portrait.r2_key, portrait.width, portrait.height).src} alt="" width="64" height="80" />
+          ) : (
+            <Picture src={eathan} alt="" formats={['avif', 'webp']} width={128} />
+          )}
+        </div>
+        <div>
+          <h2 id="portrait-h">About portrait</h2>
+          <p class="a-muted">{portrait ? 'Using your uploaded photo' : 'Using the default photo'}</p>
+        </div>
+      </div>
+      <a class="a-more" href="/admin/portrait">Replace photo<span aria-hidden="true">→</span></a>
+    </section>
+
+    <section class="a-card" aria-labelledby="flash-h">
+      <h2 id="flash-h">Designs</h2>
+      <p class="a-muted">{plural(flash.length, 'design')} · {flash.length - taken} available, {taken} taken</p>
+      <a class="a-more" href="/admin/flash">Manage designs<span aria-hidden="true">→</span></a>
+    </section>
+
+    <section class="a-card" aria-labelledby="gallery-h">
+      <h2 id="gallery-h">Gallery</h2>
+      <p class="a-muted">{gallery.length ? `${plural(gallery.length, 'piece')} · shown under "The work"` : 'Empty · the section is hidden until you add a piece'}</p>
+      <a class="a-more" href="/admin/gallery">Manage gallery<span aria-hidden="true">→</span></a>
+    </section>
+
+    <section class="a-card" aria-labelledby="content-h">
+      <h2 id="content-h">Site text</h2>
+      <p class="a-muted">About, deposit, address, phone and hours{!content.deposit && ' · deposit amount not set'}</p>
+      <a class="a-more" href="/admin/content">Edit text<span aria-hidden="true">→</span></a>
+    </section>
+
+    <section class="a-card" aria-labelledby="featured-h">
+      <h2 id="featured-h">Featured pieces</h2>
+      <p class="a-muted">{plural(featured.length, 'piece')} · shown in "The work" only if Instagram can’t load</p>
+      <a class="a-more" href="/admin/featured">Manage featured<span aria-hidden="true">→</span></a>
+    </section>
+  </div>
+
+  <p class="a-signout"><a href="/cdn-cgi/access/logout">Sign out</a></p>
+</Admin>
